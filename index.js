@@ -1,5 +1,7 @@
 const express = require('express')
 const authRouter = require('./router/auth.js')
+const db = require('./db.js')
+
 
 
 const app = express()

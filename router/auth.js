@@ -4,7 +4,7 @@ const authController = require('../controller/auth.controller.js')
 
 
 
-authRouter.get('/create', authController.createUser)
+authRouter.post('/create', authController.createUser)
 
 
 
