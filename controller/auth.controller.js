@@ -7,6 +7,7 @@ class AuthController {
 		try {
 
 			const {username, password} = req.body
+		
 
 			if (username.length > 20 || username.length < 3) {
 				res.status(400).json({message: "Error create user. Имя пользователя должно содержать 3-20 символов"})
@@ -21,15 +22,16 @@ class AuthController {
 			const hashPassword = bcrypt.hashSync(password, 7); // хэшируем пароль
 
 			try {
-				const candidate = await db.each('SELECT * FROM person WHERE username = ?', [username])
-				console.log(candidate);
+				const candidate = await db.all('SELECT * FROM person WHERE username = ?;', [username], (err, rows) => {
+					if (err) return res.status(400).json({message: 'Ошибка создания пользователя', err})
+					console.log(err)
+					if (rows) return res.status(400).json({message: "Имя пользователя должно быть уникальным"})
+				})
+				
 
-				if (candidate) {
-					res.status(400).json({message: "Имя пользователя должно быть уникальным"})
-				} else {
-					await db.run('INSERT INTO person(username, password) VALUES(?, ?)', [username, hashPassword])
-					res.json({message: 'User successfull created'})
-				}
+				await db.run('INSERT INTO person(username, password) VALUES(?, ?)', [username, hashPassword])
+				res.json({message: 'User successfull created'})
+				
 
 			} catch (error) {
 				res.status(400).json({message: 'Ошибка создания пользователя', error})
